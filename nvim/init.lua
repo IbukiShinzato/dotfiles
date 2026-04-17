@@ -19,9 +19,19 @@ vim.opt.number = true         -- 行番号
 vim.opt.signcolumn = "yes"   -- git差分などの表示
 vim.opt.termguicolors = true -- カラー有効化
 vim.opt.background = "dark"   -- nightカラーに合わせてdarkに（lightだと白飛びします）
-vim.opt.clipboard = "unnamedplus" -- クリップボド共有
 vim.opt.splitright = true    -- 縦分割は右に
 vim.opt.splitbelow = true    -- 横分割は下に
+
+-- yankした時だけクリップボードに送る
+vim.opt.clipboard = "" 
+
+vim.api.nvim_create_autocmd("TextYankPost", {
+    callback = function()
+        if vim.v.event.operator == "y" then
+            vim.fn.setreg("+", vim.fn.getreg("0"))
+        end
+    end,
+})
 
 -- =================================================
 -- 背景を透過（ターミナルの色を透かす）させる魔法の呪文
