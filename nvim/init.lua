@@ -30,6 +30,7 @@ vim.opt.splitright = true
 vim.opt.splitbelow = true
 vim.opt.relativenumber = true
 vim.opt.cursorline = true
+vim.opt.cursorcolumn = true
 vim.opt.clipboard = ""
 
 -- yankした時だけクリップボードに送る
@@ -149,6 +150,19 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
 	end,
 })
+
+-- =================================================
+-- 6. 自動フォーマット設定 (保存時に cargo fmt)
+-- =================================================
+vim.api.nvim_create_autocmd("BufWritePre", {
+    pattern = "*.rs",
+    callback = function()
+        -- LSPのフォーマット機能を呼び出す
+        -- async = false にすることで、フォーマットが終わってから保存されるようになります
+        vim.lsp.buf.format({ async = false })
+    end,
+})
+vim.opt.fixeol = true  -- 保存時に末尾に改行がなければ足す
 
 -- モード切り替え
 vim.keymap.set("i", "jj", "<Esc>")
