@@ -51,16 +51,15 @@ vim.opt.smartindent = true
 -- 4. プラグイン設定
 -- =================================================
 require("lazy").setup({
+    -- Markdown 描画最適化 (遅延読み込み)
     {
         'MeanderingProgrammer/render-markdown.nvim',
-        dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-mini/mini.nvim' },            -- if you use the mini.nvim suite
-        -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-mini/mini.icons' },        -- if you use standalone mini plugins
-        -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
-        ---@module 'render-markdown'
-        ---@type render.md.UserConfig
+        ft = { "markdown" },
+        dependencies = { 'nvim-treesitter/nvim-treesitter' },
         opts = {},
     },
-    -- テーマ設定 (独立させて定義)
+
+    -- テーマ設定 (起動時に最優先で読み込むため lazy = false)
     {
         "folke/tokyonight.nvim",
         lazy = false,
@@ -78,9 +77,10 @@ require("lazy").setup({
         end,
     },
 
-    -- LSP管理と設定
+    -- LSP管理と設定 (コードファイルを開いた時だけ読み込む)
     {
         "neovim/nvim-lspconfig",
+        ft = { "rust", "c", "cpp", "go" }, -- 対象のコードファイルを開いた瞬間のみ起動
         dependencies = {
             "williamboman/mason.nvim",
             "williamboman/mason-lspconfig.nvim",
@@ -103,7 +103,6 @@ require("lazy").setup({
                         },
                     },
                 })
-
                 vim.lsp.config("clangd", {})
                 vim.lsp.config("gopls", {})
 
@@ -114,16 +113,25 @@ require("lazy").setup({
             else
                 -- 0.10 以前の互換性用
                 local lspconfig = require("lspconfig")
-                lspconfig.rust_analyzer.setup({})
+                lspconfig.rust_analyzer.setup({
+                    settings = {
+                        ["rust-analyzer"] = {
+                            checkOnSave = {
+                                command = "clippy",
+                            },
+                        },
+                    },
+                })
                 lspconfig.clangd.setup({})
                 lspconfig.gopls.setup({})
             end
         end,
     },
 
-    -- 補完エンジン
+    -- 補完エンジン (文字入力を始めた瞬間、またはLSPが起動した時に読み込む)
     {
         "hrsh7th/nvim-cmp",
+        event = { "InsertEnter", "LspAttach" },
         dependencies = {
             "hrsh7th/cmp-nvim-lsp",
             "hrsh7th/cmp-buffer",
@@ -149,27 +157,30 @@ require("lazy").setup({
         end,
     },
 
-    -- fzf
+    -- fzf (ファイル検索用ショートカットキーが押された時に読み込む)
     {
         "junegunn/fzf.vim",
+        cmd = { "Files", "GFiles", "Buffers", "Rg" },
         dependencies = { "junegunn/fzf" },
         config = function()
             vim.g.fzf_layout = { window = { width = 0.9, height = 0.6 } }
         end,
     },
 
-    -- Peekaboo
+    -- Peekaboo (レジスタ表示のキーを押した瞬間に読み込む)
     {
         "junegunn/vim-peekaboo",
+        event = "BufReadPost", -- ファイルを読み込んだ後に裏でひっそり準備
         config = function()
             vim.g.peekaboo_window = "bo 20new"
         end,
     },
 
+    -- 周辺プラグインのトリガー最適化
     { "windwp/nvim-autopairs", event = "InsertEnter", opts = {} },
-    { "lukas-reineke/indent-blankline.nvim", main = "ibl", opts = {} },
-    { "nvim-treesitter/nvim-treesitter", build = ":TSUpdate" },
-    { "lewis6991/gitsigns.nvim", opts = {} },
+    { "lukas-reineke/indent-blankline.nvim", main = "ibl", event = { "BufReadPost", "BufNewFile" }, opts = {} },
+    { "nvim-treesitter/nvim-treesitter", build = ":TSUpdate", event = { "BufReadPost", "BufNewFile" } },
+    { "lewis6991/gitsigns.nvim", event = { "BufReadPost", "BufNewFile" }, opts = {} },
 })
 
 -- =================================================
@@ -203,7 +214,7 @@ vim.keymap.set("i", "jj", "<Esc>")
 vim.keymap.set("n", "<C-s>", ":w<CR>")
 vim.keymap.set("i", "<C-s>", "<Esc>:w<CR>")
 
--- ファイル検索
+-- ファイル検索 (fzfをコマンド経由で叩く)
 vim.keymap.set("n", "<Leader>f", ":Files<CR>", { silent = true })
 
 -- ウィンドウ移動
