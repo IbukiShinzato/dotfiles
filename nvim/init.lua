@@ -226,3 +226,6 @@ vim.keymap.set("n", "<C-l>", "<C-w>l")
 -- 行頭 / 行末移動
 vim.keymap.set("n", "<C-a>", "^")
 vim.keymap.set("n", "<C-e>", "$")
+
+-- Space + r でrun scriptを走らす
+vim.keymap.set("n", "<Leader>r", ":!./run.sh<CR>", { silent = true })
