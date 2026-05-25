@@ -51,14 +51,6 @@ vim.opt.smartindent = true
 -- 4. プラグイン設定
 -- =================================================
 require("lazy").setup({
-    -- Markdown 描画最適化 (遅延読み込み)
-    {
-        'MeanderingProgrammer/render-markdown.nvim',
-        ft = { "markdown" },
-        dependencies = { 'nvim-treesitter/nvim-treesitter' },
-        opts = {},
-    },
-
     -- テーマ設定 (起動時に最優先で読み込むため lazy = false)
     {
         "folke/tokyonight.nvim",
@@ -80,7 +72,7 @@ require("lazy").setup({
     -- LSP管理と設定 (コードファイルを開いた時だけ読み込む)
     {
         "neovim/nvim-lspconfig",
-        ft = { "rust", "c", "cpp", "go" }, -- 対象のコードファイルを開いた瞬間のみ起動
+        ft = { "rust", "c", "cpp", "go" },
         dependencies = {
             "williamboman/mason.nvim",
             "williamboman/mason-lspconfig.nvim",
@@ -93,11 +85,10 @@ require("lazy").setup({
 
             -- LSP設定
             if vim.lsp.config then
-                -- Neovim 0.11+ の書き方
                 vim.lsp.config("rust_analyzer", {
                     settings = {
                         ["rust-analyzer"] = {
-                            checkOnSave = {
+                            check = {
                                 command = "clippy",
                             },
                         },
@@ -106,12 +97,10 @@ require("lazy").setup({
                 vim.lsp.config("clangd", {})
                 vim.lsp.config("gopls", {})
 
-                -- サーバーを有効化
                 vim.lsp.enable("rust_analyzer")
                 vim.lsp.enable("clangd")
                 vim.lsp.enable("gopls")
             else
-                -- 0.10 以前の互換性用
                 local lspconfig = require("lspconfig")
                 lspconfig.rust_analyzer.setup({
                     settings = {
@@ -226,6 +215,8 @@ vim.keymap.set("n", "<C-l>", "<C-w>l")
 -- 行頭 / 行末移動
 vim.keymap.set("n", "<C-a>", "^")
 vim.keymap.set("n", "<C-e>", "$")
+vim.keymap.set("n", "<C-k>", "d$") 
+vim.keymap.set("i", "<C-k>", "<C-o>D") 
 
 -- Space + r でrun scriptを走らす
 vim.keymap.set("n", "<Leader>r", ":!./run.sh<CR>", { silent = true })
