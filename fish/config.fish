@@ -123,3 +123,21 @@ function last_history_item
     echo $history[1]
 end 
 abbr -a !! --position anywhere --function last_history_item
+
+function fs
+    if test (count $argv) -eq 0
+        echo "Usage: fs [size]  (e.g., fs 13, fs 11.5)"
+        return 1
+    end
+
+    set -l new_size $argv[1]
+    set -l toml_path "$HOME/.config/alacritty/alacritty.toml"
+
+    if test -f $toml_path
+        sed -i '' "s/size *= *[0-9.]*/size = $new_size/" $toml_path
+        echo "Alacritty font size changed to $new_size"
+    else
+        echo "Error: alacritty.toml not found at $toml_path"
+    end
+end
+
