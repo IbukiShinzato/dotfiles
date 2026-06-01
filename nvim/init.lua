@@ -72,7 +72,7 @@ require("lazy").setup({
     -- LSP管理と設定 (コードファイルを開いた時だけ読み込む)
     {
         "neovim/nvim-lspconfig",
-        ft = { "rust", "c", "cpp", "go" },
+        ft = { "rust", "c", "cpp", "go", "python" },
         dependencies = {
             "williamboman/mason.nvim",
             "williamboman/mason-lspconfig.nvim",
@@ -80,7 +80,7 @@ require("lazy").setup({
         config = function()
             require("mason").setup()
             require("mason-lspconfig").setup({
-                ensure_installed = { "rust_analyzer", "clangd", "gopls" },
+                ensure_installed = { "rust_analyzer", "clangd", "gopls", "pyright" },
             })
 
             -- LSP設定
@@ -96,10 +96,12 @@ require("lazy").setup({
                 })
                 vim.lsp.config("clangd", {})
                 vim.lsp.config("gopls", {})
+                vim.lsp.config("pyright", {})
 
                 vim.lsp.enable("rust_analyzer")
                 vim.lsp.enable("clangd")
                 vim.lsp.enable("gopls")
+                vim.lsp.enable("pyright")
             else
                 local lspconfig = require("lspconfig")
                 lspconfig.rust_analyzer.setup({
