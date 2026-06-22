@@ -88,6 +88,7 @@ require("lazy").setup({
                 vim.lsp.config("rust_analyzer", {
                     settings = {
                         ["rust-analyzer"] = {
+                            checkOnSave = true,
                             check = {
                                 command = "clippy",
                             },
@@ -222,3 +223,11 @@ vim.keymap.set("i", "<C-k>", "<C-o>D")
 
 -- Space + r でrun scriptを走らす
 vim.keymap.set("n", "<Leader>r", ":!./run.sh<CR>", { silent = true })
+
+vim.diagnostic.config({
+    virtual_text = true,
+    signs = true,
+    underline = true,
+    update_in_insert = false,
+    severity_sort = true,
+})
